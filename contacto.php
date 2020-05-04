@@ -1,3 +1,37 @@
+<?php  
+//Imprimir en pantalla las variables que recibimos desde el formulario
+//print_r($_POST);
+
+$mensaje = '';
+
+//Tenemos que verificar que los datos del formulario se hayan enviado vía post.
+if (isset($_POST['enviar']) && $_POST['enviar'] == 'si') {
+	//print_r($_POST);
+	//Entonces recuperamos los datos del formulario
+	$nombre = $_POST['nombre'];
+	$email = $_POST['email'];
+	$asunto = $_POST['asunto'];
+	$comentario = $_POST['comentario'];
+
+	if (!$nombre) {
+		$mensaje = 'Ingrese su nombre';
+	}elseif (!$email) {
+		$mensaje = 'El email no es válido';
+	}elseif (!$asunto) {
+		$mensaje = 'Seleccione un asunto';
+	}elseif (!$comentario) {
+		$mensaje = 'Ingrese un comentario';
+	}else{
+		$m = 'Gracias por escribirnos, pronto nos comunicaremos con usted';
+		header('Location: saludo.php?nombre=' . $nombre);
+	}
+
+}else{
+	$mensaje = 'Los datos no han sido enviados correctamente';
+	
+}
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,14 +44,18 @@
 	<div class="container">
 		<div class="col-md-6 mt-4">
 			<h3>Formulario de Contacto</h3>
+			<!--Verificar que haya errores-->
+			<?php if($mensaje): ?>
+				<p class="alert alert-danger"><?php echo $mensaje; ?></p>
+			<?php endif;?>
 			<form action="" method="post">
 				<div class="form-group">
 					<label for="nombre">Ingrese su nombre</label>
-					<input type="text" name="nombre" placeholder="Ingrese su nombre completo" class="form-control">
+					<input type="text" name="nombre" placeholder="Ingrese su nombre completo" class="form-control" value="<?php echo @($nombre); ?>">
 				</div>
 				<div class="form-group">
 					<label>Ingrese su email: </label>
-					<input type="email" name="email" placeholder="Ingrese su correo electronico" class="form-control">
+					<input type="email" name="email" placeholder="Ingrese su correo electronico" class="form-control" value="<?php echo @($email); ?>">
 				</div>
 				<div class="form-group">
 					<label>Seleccione un asunto: </label>
@@ -30,9 +68,12 @@
 				</div>
 				<div class="form-group">
 					<label>Comentario: </label>
-					<textarea name="comentario" class="form-control" rows="4" placeholder="Ingrese su comentario" style="resize: none"></textarea>
+					<textarea name="comentario" class="form-control" rows="4" placeholder="Ingrese su comentario" style="resize: none">
+						<?php echo @($comentario);?>
+					</textarea>
 				</div>
 				<div class="form-group">
+					<!--El input enviar sevirá para verificar que los datos se han enviado via post-->
 					<input type="hidden" name="enviar" value="si">
 					<button type="submit" class="btn btn-success">Enviar</button>
 				</div>
