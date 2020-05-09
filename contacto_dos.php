@@ -1,33 +1,28 @@
 <?php  
-//Requerimos del codigo del arhivo datos.php para ser usado en esta pagina
-require('datos.php');
-//Imprimir en pantalla las variables que recibimos desde el formulario
-//print_r($_POST);
+//Funciones que muestran errores de php en tiempo de ejecucion
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
 
-$mensaje = '';
+//Requerimos de la clase "procesa" a través de su archivo.
+require('procesa.php');
+$procesa = new Procesa();
 
-//Tenemos que verificar que los datos del formulario se hayan enviado vía post.
-if (isset($_POST['enviar']) && $_POST['enviar'] == 'si') {
-	//print_r($_POST);
-	//Entonces recuperamos los datos del formulario
+if (isset($_POST['enviar']) && $_POST['enviar'] == 'si'){	
+
 	$nombre = $_POST['nombre'];
 	$email = $_POST['email'];
-	$asunto = $_POST['asunto'];
-	$comentario = $_POST['comentario'];
 
-	if (!$nombre) {
+	if(!$nombre){
 		$mensaje = 'Ingrese su nombre';
-	}elseif (!$email) {
-		$mensaje = 'El email no es válido';
-	}elseif (!$asunto) {
-		$mensaje = 'Seleccione un asunto';
-	}elseif (!$comentario) {
-		$mensaje = 'Ingrese un comentario';
+	}elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+		$mensaje = 'El email no es valido';
 	}else{
-		$m = 'Gracias por escribirnos, pronto nos comunicaremos con usted';
-		header('Location: saludo.php?nombre=' . $nombre);
-	}
+		$procesa->setNombre($nombre);
+		$procesa->setEmail($email);
 
+		echo $procesa->getNombre() . '<br>';
+		echo $procesa->getEmail();
+	}
 }
 
 ?>
@@ -44,9 +39,10 @@ if (isset($_POST['enviar']) && $_POST['enviar'] == 'si') {
 		<div class="col-md-6 mt-4">
 			<h3>Formulario de Contacto</h3>
 			<!--Verificar que haya errores-->
-			<?php if($mensaje): ?>
+			<?php if(isset($mensaje)): ?>
 				<p class="alert alert-danger"><?php echo $mensaje; ?></p>
-			<?php endif;?>
+			<?php endif; ?>
+
 			<form action="" method="post">
 				<div class="form-group">
 					<label for="nombre">Ingrese su nombre</label>
@@ -54,15 +50,12 @@ if (isset($_POST['enviar']) && $_POST['enviar'] == 'si') {
 				</div>
 				<div class="form-group">
 					<label>Ingrese su email: </label>
-					<input type="email" name="email" placeholder="Ingrese su correo electronico" class="form-control" value="<?php echo @($email); ?>">
+					<input type="text" name="email" placeholder="Ingrese su correo electronico" class="form-control" value="<?php echo @($email); ?>">
 				</div>
 				<div class="form-group">
 					<label"">Comuna</label>
 					<select name="comuna" class="form-control">
-						<option value="">Seleccione...</option>
-						<?php foreach($comunas as $comuna): ?>
-							<option value=""><?php echo $comuna; ?></option>
-						<?php endforeach; ?>
+						<option value="">Seleccione...</option>						
 					</select>
 				</div>		
 				<div class="form-group">
@@ -77,7 +70,7 @@ if (isset($_POST['enviar']) && $_POST['enviar'] == 'si') {
 				<div class="form-group">
 					<label>Comentario: </label>
 					<textarea name="comentario" class="form-control" rows="4" placeholder="Ingrese su comentario" style="resize: none">
-						<?php echo @($comentario);?>
+						
 					</textarea>
 				</div>
 				<div class="form-group">
